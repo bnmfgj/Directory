@@ -3,29 +3,34 @@ package com.jkxy.directory;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
 
     private EditText etName, etTel;
     private ListView lv;
-
-    private SimpleAdapter simpleAdapter;
-
-    private List<Map<String,Object>> datalist;
+    private ArrayAdapter<String> arr;
+    private SimpleAdapter sa;
+    private List<Map<String, Object>> datalist;
+    private TextView tvName, tvTel;
 
 
     @Override
@@ -33,14 +38,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        int[] arr = {R.id.listViewName, R.id.listViewTel};
         initView();
         //新建适配器
         //适配器加载数据源
-        datalist=new ArrayList<>();
-        simpleAdapter = new SimpleAdapter(this,datalist , R.layout.layou_listview, new String[]{"姓名", "电话"}, arr);
+        String[] data = {"阿斯达wr", "qwe", "爱仕达", "公司", "叫我"};
+        datalist = new ArrayList<>();
+        arr = new ArrayAdapter(this, android.R.layout.simple_list_item_1, data);
+        sa = new SimpleAdapter(this, datalist, R.layout.layou_listview, new String[]{"name", "Tel"}, new int[]{R.id.listViewName, R.id.listViewTel});
+        lv.setAdapter(sa);
+
 
     }
+
+    /*private List<Map<String, Object>> getdata() {
+        for(int i=0;i<20;i++){
+            Map<String,Object>map=new HashMap<>();
+            map.put("name","zhangsan");
+            map.put("Tel","32165498");
+            datalist.add(map);
+        }
+        return datalist;
+    }*/
 
     public void startDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -62,14 +80,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.show();
     }
 
-    public void startListDialog() {
+    public void startListDialog(String s) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("请选择颜色");
-        final String[] colours = {"蓝色", "红色", "黄色"};
-        builder.setItems(colours, new DialogInterface.OnClickListener() {
+        builder.setTitle("请选择操作");
+        final String[] operation = {"打电话", "发短信"};
+        final String tel=s;
+        builder.setItems(operation, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(MainActivity.this, colours[which], Toast.LENGTH_SHORT).show();
+                switch (which) {
+                    case 0:
+                        Uri uri = Uri.parse("tel:" +tel);
+                        Intent i = new Intent();
+                        i.setAction(Intent.ACTION_CALL);
+                        i.setData(uri);
+                        MainActivity.this.startActivity(i);
+
+
+                        break;
+                    case 1:
+                        Toast.makeText(MainActivity.this, "发短信", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         builder.show();
@@ -100,12 +131,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", etName.getText().toString());
+                map.put("Tel", etTel.getText().toString());
+                datalist.add(map);
             }
         });
 
         builder.show();
+
     }
+
 
     @Override
     public void onClick(View v) {
@@ -122,17 +158,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnViewDialog:
                 startViewDialog();
                 break;
+
         }
     }
 
     public void initView() {
-        findViewById(R.id.btnSD).setOnClickListener(this);
+/*        findViewById(R.id.btnSD).setOnClickListener(this);
         findViewById(R.id.btnList).setOnClickListener(this);
-        findViewById(R.id.btnChoice).setOnClickListener(this);
+        findViewById(R.id.btnChoice).setOnClickListener(this);*/
         findViewById(R.id.btnViewDialog).setOnClickListener(this);
-        lv = (ListView) findViewById(R.id.lv);
 
+
+        lv = (ListView) findViewById(R.id.lv);
+        lv.setOnItemClickListener(this);
+        lv.setOnScrollListener(this);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        HashMap<String, String> tel = (HashMap<String, String>) parent.getItemAtPosition(position);
+        String s=tel.get("Tel");
+        startListDialog(s);
+    }
+
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
 
     }
 
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+    }
 }

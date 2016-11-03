@@ -30,16 +30,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnViewDialog"
         android:text="打开自定义对话框"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvName"
-        android:text="姓名"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvTel"
-        android:text="电话"/>
+
     <ListView
         android:id="@+id/lv"
         android:layout_width="match_parent"
