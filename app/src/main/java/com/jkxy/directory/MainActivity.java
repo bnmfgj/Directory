@@ -2,10 +2,14 @@ package com.jkxy.directory;
 
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -135,6 +139,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 map.put("name", etName.getText().toString());
                 map.put("Tel", etTel.getText().toString());
                 datalist.add(map);
+                ContentResolver cr=getContentResolver();
+                ContentValues values=new ContentValues();
+                Uri uri=cr.insert(ContactsContract.RawContacts.CONTENT_URI,values);
+                Long raw=ContentUris.parseId(uri);
+                values.clear();
+                values.put(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID,raw);
+                values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,etName.getText().toString());
+                values.put(ContactsContract.CommonDataKinds.StructuredName.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+                uri=cr.insert(ContactsContract.Data.CONTENT_URI,values);
+                values.clear();
+                values.put(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID,raw);
+                values.put(ContactsContract.CommonDataKinds.Phone.NUMBER,etTel.getText().toString());
+                values.put(ContactsContract.CommonDataKinds.Phone.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+                uri=cr.insert(ContactsContract.Data.CONTENT_URI,values);
             }
         });
 
