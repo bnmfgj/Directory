@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnViewDialog"
-        android:text="打开自定义对话框"/>
+        android:text="@string/dialog"/>
 
     <ListView
         android:id="@+id/lv"

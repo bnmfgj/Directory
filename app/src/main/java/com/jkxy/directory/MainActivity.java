@@ -9,7 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -88,13 +88,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("请选择操作");
         final String[] operation = {"打电话", "发短信"};
-        final String tel=s;
+
+        final String tel = s;
         builder.setItems(operation, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        Uri uri = Uri.parse("tel:" +tel);
+                        Uri uri = Uri.parse("tel:" + tel);
                         Intent i = new Intent();
                         i.setAction(Intent.ACTION_CALL);
                         i.setData(uri);
@@ -139,20 +140,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 map.put("name", etName.getText().toString());
                 map.put("Tel", etTel.getText().toString());
                 datalist.add(map);
-                ContentResolver cr=getContentResolver();
-                ContentValues values=new ContentValues();
-                Uri uri=cr.insert(ContactsContract.RawContacts.CONTENT_URI,values);
-                Long raw=ContentUris.parseId(uri);
+                addContacts();
+
+
+                /*ContentResolver cr = getContentResolver();
+                ContentValues values = new ContentValues();
+                Uri uri = cr.insert(ContactsContract.RawContacts.CONTENT_URI, values);
+                Long raw = ContentUris.parseId(uri);
                 values.clear();
-                values.put(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID,raw);
-                values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,etName.getText().toString());
+                values.put(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, raw);
+                values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, etName.getText().toString());
                 values.put(ContactsContract.CommonDataKinds.StructuredName.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
-                uri=cr.insert(ContactsContract.Data.CONTENT_URI,values);
+                uri = cr.insert(ContactsContract.Data.CONTENT_URI, values);
                 values.clear();
-                values.put(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID,raw);
+                values.put(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID, raw);
                 values.put(ContactsContract.CommonDataKinds.Phone.NUMBER,etTel.getText().toString());
                 values.put(ContactsContract.CommonDataKinds.Phone.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-                uri=cr.insert(ContactsContract.Data.CONTENT_URI,values);
+                uri = cr.insert(ContactsContract.Data.CONTENT_URI, values);*/
             }
         });
 
@@ -195,7 +199,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         HashMap<String, String> tel = (HashMap<String, String>) parent.getItemAtPosition(position);
-        String s=tel.get("Tel");
+        //String n =tel.get("name");
+        String s = tel.get("Tel");
         startListDialog(s);
     }
 
@@ -208,5 +213,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
+    }
+
+    public void addContacts() {
+        Uri uri = Uri.parse("content://com.android.contacts/raw_contacts");
+        ContentResolver resolver=getContentResolver();
+        ContentValues values=new ContentValues();
+        long contactId = ContentUris.parseId(resolver.insert(uri,values));
+
+        uri =Uri.parse("content://com.android.contacts/data");
+        values.put("raw_contact_id",contactId);
+        values.put("mimetype","vnd.android.cursor.item/name");
+        values.put("data2",etName.getText().toString());
+        resolver.insert(uri,values);
+
+        values.clear();
+        values.put("raw_contact_id",contactId);
+        values.put("mimetype", "vnd.android.cursor.item/phone_v2");
+        values.put("data2", "2");
+        values.put("data1", etTel.getText().toString());
+        resolver.insert(uri, values);
     }
 }
