@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayAdapter<String> arr;
     private SimpleAdapter sa;
     private List<Map<String, Object>> datalist;
-    private TextView tvName, tvTel;
 
 
     @Override
@@ -99,12 +98,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Intent i = new Intent();
                         i.setAction(Intent.ACTION_CALL);
                         i.setData(uri);
-                        MainActivity.this.startActivity(i);
-
-
+                        startActivity(i);
                         break;
                     case 1:
-                        Toast.makeText(MainActivity.this, "发短信", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_SENDTO);
+                        intent.setData(Uri.parse("smsto:"+tel));
+                        intent.putExtra("sms_body","");
+                        startActivity(intent);
+                        break;
+
                 }
             }
         });
